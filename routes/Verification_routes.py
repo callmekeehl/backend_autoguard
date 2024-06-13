@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from Email_send import send_reset_email
 from models.Utilisateur import Utilisateur
 from flask_login import current_user, login_required
 from app import db

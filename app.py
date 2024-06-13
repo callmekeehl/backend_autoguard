@@ -3,6 +3,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from Email_send import mail
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://justkeehl:justkeehl2003@localhost/backend_shema'
@@ -24,6 +25,15 @@ login_manager.login_view = 'auth_bp.login'
 @login_manager.user_loader
 def load_user(user_id):
     return Utilisateur.query.get(int(user_id))
+
+# Configuration de Flask-Mail dans votre fichier principal Flask
+app.config['MAIL_SERVER'] = 'smtp.yourserver.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'justkeehl@gmail.com'
+app.config['MAIL_PASSWORD'] = 'REBECCALIEBEN2003'
+mail.init_app(app)
+
 
 
 # Enregistrement des blueprints
