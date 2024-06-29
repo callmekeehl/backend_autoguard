@@ -1,5 +1,7 @@
-from flask import Blueprint, request, jsonify
+import datetime
+from flask import Blueprint, current_app, request, jsonify
 from flask_login import login_required
+import jwt
 from models import Declaration, Notification, Rdv, Police, Garage
 from models.Utilisateur import Utilisateur
 from app import db
@@ -9,7 +11,6 @@ utilisateur_bp = Blueprint('utilisateur_bp', __name__)
 
 # Utilisateur routes
 @utilisateur_bp.route('/utilisateurs', methods=['GET', 'POST'])
-@login_required
 def handle_utilisateurs():
     if request.method == 'POST':
         data = request.get_json()
@@ -23,7 +24,14 @@ def handle_utilisateurs():
         new_user.motDePasse = data['motDePasse']
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({"message": "Utilisateur créé"}), 201
+
+        # Génération d'un jeton JWT pour le nouvel utilisateur
+        token = jwt.encode({
+            'user_id': new_user.utilisateurId,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expire dans 1 heure
+        }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+        return jsonify({"message": "Utilisateur créé", "access_token": token}), 201
 
     if request.method == 'GET':
         utilisateurs = Utilisateur.query.all()
