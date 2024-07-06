@@ -31,7 +31,7 @@ def handle_utilisateurs():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expire dans 1 heure
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-        return jsonify({"message": "Utilisateur créé", "access_token": token}), 201
+        return jsonify({"message": "Utilisateur créé", "access_token": token, "user": new_user}), 201
 
     if request.method == 'GET':
         utilisateurs = Utilisateur.query.all()
