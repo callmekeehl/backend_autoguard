@@ -11,3 +11,12 @@ class Garage(Utilisateur):
     utilisateur = db.relationship("Utilisateur", backref="garage", uselist=False)
     nomGarage = db.Column(db.String(100), nullable=False)
     adresseGarage = db.Column(db.String(200), nullable=False)
+
+    def to_dict(self):
+        utilisateur_data = super().to_dict()
+        utilisateur_data.update({
+            'garageId': self.garageId,
+            'nomGarage': self.nomGarage,
+            'adresseGarage': self.adresseGarage
+        })
+        return utilisateur_data

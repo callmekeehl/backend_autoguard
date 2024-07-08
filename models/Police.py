@@ -12,3 +12,12 @@ class Police(Utilisateur):
     utilisateur = db.relationship("Utilisateur", backref="police", uselist=False)
     nomDepartement = db.Column(db.String(100), nullable=False)
     adresseDepartement = db.Column(db.String(200), nullable=False)
+
+    def to_dict(self):
+        utilisateur_data = super().to_dict()
+        utilisateur_data.update({
+            'policeId': self.policeId,
+            'nomDepartement': self.nomDepartement,
+            'adresseDepartement': self.adresseDepartement
+        })
+        return utilisateur_data

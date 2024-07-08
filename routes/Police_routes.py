@@ -1,4 +1,6 @@
-from flask import Blueprint, request, jsonify
+import datetime
+from flask import Blueprint, current_app, request, jsonify
+import jwt
 from models.Police import Police
 from models.Utilisateur import Utilisateur
 from app import db
@@ -28,15 +30,29 @@ def create_police():
             email=data['email'],
             adresse=data['adresse'],
             telephone=data['telephone'],
-            type='police',  # Utilisez le polymorphic_identity 'police'
+            type='police', 
             nomDepartement=data['nomDepartement'],
             adresseDepartement=data['adresseDepartement']
         )
         new_police.motDePasse = data['motDePasse']
         db.session.add(new_police)
         db.session.commit()  # Commit ici pour persister les changements
+        
+        # Générez un jeton JWT pour le nouveau garage
+        token = jwt.encode({
+            'police_id': new_police.utilisateurId,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expire dans 1 heure
+        }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-        return jsonify({"message": "Police créée", "policeId": new_police.policeId}), 201
+        # Inclure le jeton et les informations du compte dans la réponse
+        response_data = {
+            "message": "Police créé",
+            "policeId": new_police.policeId,
+            "access_token": token,
+            "police": new_police.to_dict()
+        }
+
+        return jsonify(response_data), 201
 
     except Exception as e:
         db.session.rollback()

@@ -1,7 +1,11 @@
-from flask import Blueprint, request, jsonify
+import datetime
+from flask import Blueprint, current_app, request, jsonify
+import jwt
 from models.Garage import Garage
 from models.Utilisateur import Utilisateur
 from app import db
+from flask_jwt_extended import create_access_token
+
 
 garage_bp = Blueprint('garage_bp', __name__)
 
@@ -29,15 +33,29 @@ def create_garage():
             email=data['email'],
             adresse=data['adresse'],
             telephone=data['telephone'],
-            type='garage',  # Utilisez le polymorphic_identity 'garage'
+            type='garage',
             nomGarage=data['nomGarage'],
             adresseGarage=data['adresseGarage']
         )
         new_garage.motDePasse = data['motDePasse']
         db.session.add(new_garage)
-        db.session.commit()  # Commit ici pour persister les changements
+        db.session.commit()
 
-        return jsonify({"message": "Garage créé", "garageId": new_garage.garageId}), 201
+         # Générez un jeton JWT pour le nouveau garage
+        token = jwt.encode({
+            'garage_id': new_garage.utilisateurId,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expire dans 1 heure
+        }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+        # Inclure le jeton et les informations du compte dans la réponse
+        response_data = {
+            "message": "Garage créé",
+            "garageId": new_garage.garageId,
+            "access_token": token,
+            "garage": new_garage.to_dict()
+        }
+
+        return jsonify(response_data), 201
 
     except Exception as e:
         db.session.rollback()
