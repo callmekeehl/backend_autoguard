@@ -1,8 +1,8 @@
-"""Initial migration.
+"""empty message
 
-Revision ID: 554efe1c8899
+Revision ID: d699c7a40cd4
 Revises: 
-Create Date: 2024-06-12 15:17:18.340012
+Create Date: 2024-07-28 01:31:10.831000
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '554efe1c8899'
+revision = 'd699c7a40cd4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -64,6 +64,14 @@ def upgrade():
     sa.PrimaryKeyConstraint('garageId'),
     sa.UniqueConstraint('utilisateurId')
     )
+    op.create_table('motif_rdv',
+    sa.Column('motifId', sa.Integer(), nullable=False),
+    sa.Column('utilisateurId', sa.Integer(), nullable=False),
+    sa.Column('motifDescription', sa.String(length=200), nullable=False),
+    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['utilisateurId'], ['utilisateur.utilisateurId'], ),
+    sa.PrimaryKeyConstraint('motifId')
+    )
     op.create_table('notification',
     sa.Column('notificationId', sa.Integer(), nullable=False),
     sa.Column('utilisateurId', sa.Integer(), nullable=False),
@@ -100,6 +108,7 @@ def downgrade():
     op.drop_table('rdv')
     op.drop_table('police')
     op.drop_table('notification')
+    op.drop_table('motif_rdv')
     op.drop_table('garage')
     op.drop_table('declaration')
     op.drop_table('admin')

@@ -38,7 +38,7 @@ def create_police():
         db.session.add(new_police)
         db.session.commit()  # Commit ici pour persister les changements
         
-        # Générez un jeton JWT pour le nouveau garage
+        # Générez un jeton JWT pour le nouveau compte police
         token = jwt.encode({
             'police_id': new_police.utilisateurId,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expire dans 1 heure
@@ -95,3 +95,4 @@ def handle_police(id):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+

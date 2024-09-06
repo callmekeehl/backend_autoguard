@@ -31,7 +31,9 @@ def handle_utilisateurs():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expire dans 1 heure
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-        return jsonify({"message": "Utilisateur créé", "access_token": token, "user": new_user}), 201
+        return jsonify({"message": "Utilisateur créé", "access_token": token,"user_id": new_user.utilisateurId, "user": new_user.to_dict()}), 201
+    
+        
 
     if request.method == 'GET':
         utilisateurs = Utilisateur.query.all()
@@ -39,7 +41,6 @@ def handle_utilisateurs():
 
 
 @utilisateur_bp.route('/utilisateurs/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-@login_required
 def handle_utilisateur(id):
     utilisateur = Utilisateur.query.get_or_404(id)
 
@@ -62,3 +63,12 @@ def handle_utilisateur(id):
         db.session.delete(utilisateur)
         db.session.commit()
         return jsonify({"message": "Utilisateur supprimé"})
+    
+@utilisateur_bp.route('/utilisateurs/<int:id>', methods=['GET'])
+def get_utilisateur(id):
+    utilisateur = Utilisateur.query.get_or_404(id)
+    return jsonify({
+        'nom': utilisateur.nom,
+        'prenom': utilisateur.prenom,
+        'utilisateurId': utilisateur.utilisateurId
+    })

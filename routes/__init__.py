@@ -10,6 +10,7 @@ from routes.Admin_routes import admin_bp
 from routes.Rdv_routes import rdv_bp
 from routes.Auth_routes import auth_bp
 from routes.Verification_routes import verification_bp
+from routes.MotifRdv_routes import motif_bp
 
 
 # Création d'un blueprint principal pour l'application
@@ -27,3 +28,4 @@ def register_blueprints(app):
     app.register_blueprint(rdv_bp, url_prefix='/api')
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(verification_bp, url_prefix='/api')
+    app.register_blueprint(motif_bp, url_prefix='/api')

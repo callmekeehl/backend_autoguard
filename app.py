@@ -1,5 +1,6 @@
 # app.py
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -11,6 +12,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 app.config['SECRET_KEY'] = 'justkeehl'  # Changez cela pour une clé sécurisée
+# Configuration JWT
+app.config['JWT_SECRET_KEY'] = 'justkeehl'  # Clé secrète pour signer les tokens JWT
+app.config['JWT_TOKEN_LOCATION'] = ['headers']    # Emplacement du token JWT (par défaut 'headers')
+app.config['JWT_HEADER_NAME'] = 'Authorization'   # Nom de l'en-tête où le JWT est envoyé
+app.config['JWT_HEADER_TYPE'] = 'Bearer'          # Préfixe du token JWT
+jwt = JWTManager(app)
+
 
 
 # Importation des modèles

@@ -31,10 +31,35 @@ def login():
 
             print("JWT generated")
 
-            return jsonify({
-                "message": "Connexion réussie",
-                "token": token,
-                "user": {
+            # Préparer les données en fonction du type d'utilisateur
+            if user.type == 'garage':
+                user_data = {
+                    "utilisateurId": user.utilisateurId,
+                    "type": user.type,
+                    "nom": user.nom,
+                    "prenom": user.prenom,
+                    "email": user.email,
+                    "adresse": user.adresse,
+                    "telephone": user.telephone,
+                    "nomGarage" : user.nomGarage,
+                    "adresseGarage" : user.adresseGarage,
+                    "garageId": user.garageId
+                }
+            elif user.type == 'police':
+                user_data = {
+                    "utilisateurId": user.utilisateurId,
+                    "type": user.type,
+                    "nom": user.nom,
+                    "prenom": user.prenom,
+                    "email": user.email,
+                    "adresse": user.adresse,
+                    "telephone": user.telephone,
+                    "nomDepartement" : user.nomDepartement,
+                    "adresseDepartement" : user.adresseDepartement,
+                    "policeId": user.policeId
+                }
+            else:  # Utilisateur normal
+                user_data = {
                     "utilisateurId": user.utilisateurId,
                     "type": user.type,
                     "nom": user.nom,
@@ -43,6 +68,12 @@ def login():
                     "adresse": user.adresse,
                     "telephone": user.telephone
                 }
+
+
+            return jsonify({
+                "message": "Connexion réussie",
+                "token": token,
+                "user": user_data
             }), 200
         else:
             print("Mot de passe Invalide")
