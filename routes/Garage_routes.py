@@ -49,6 +49,7 @@ def create_garage():
 
         # Inclure le jeton et les informations du compte dans la réponse
         response_data = {
+            "user_id": new_garage.utilisateurId,
             "message": "Garage créé",
             "garageId": new_garage.garageId,
             "access_token": token,

@@ -69,11 +69,18 @@ def get_motifs():
 def accepter_rdv(motifId):
     motif = MotifRdv.query.get_or_404(motifId)
 
+    # Récupérer le policeId depuis la requête (ajustez selon votre logique)
+    data = request.get_json()
+    policeId = data.get('policeId')
+    
+    if not policeId:
+        return jsonify({"error": "policeId is required"}), 400
     # Création du rendez-vous à partir du motif accepté
     nouveau_rdv = Rdv(
         utilisateurId=motif.utilisateurId,
+        policeId=policeId,
         motif=motif.motifDescription,
-        date=motif.date
+        date=motif.date,
     )
     db.session.add(nouveau_rdv)
 
@@ -81,7 +88,7 @@ def accepter_rdv(motifId):
     utilisateur = Utilisateur.query.get(motif.utilisateurId)
     if utilisateur:
         nouvelle_notification = Notification(
-            utilisateurId=utilisateur.id,
+            utilisateurId=utilisateur.utilisateurId,
             message="Votre rendez-vous a été accepté."
         )
         db.session.add(nouvelle_notification)
@@ -102,7 +109,7 @@ def rejeter_rdv(motifId):
     utilisateur = Utilisateur.query.get(motif.utilisateurId)
     if utilisateur:
         nouvelle_notification = Notification(
-            utilisateurId=utilisateur.id,
+            utilisateurId=utilisateur.utilisateurId,
             message=f"Votre rendez-vous a été rejeté : {raison_rejet}"
         )
         db.session.add(nouvelle_notification)
@@ -112,3 +119,9 @@ def rejeter_rdv(motifId):
     db.session.commit()
 
     return jsonify({"message": "Rendez-vous rejeté et notification envoyée."}), 200
+
+
+@rdv_bp.route('/rdvs/utilisateurs/<int:utilisateurId>', methods=['GET'])
+def get_rdvs_by_user(utilisateurId):
+    rdvs = Rdv.query.filter_by(utilisateurId=utilisateurId).all()
+    return jsonify([rdv.to_dict() for rdv in rdvs])
