@@ -125,3 +125,8 @@ def rejeter_rdv(motifId):
 def get_rdvs_by_user(utilisateurId):
     rdvs = Rdv.query.filter_by(utilisateurId=utilisateurId).all()
     return jsonify([rdv.to_dict() for rdv in rdvs])
+
+@rdv_bp.route('/rdvs/polices/<int:policeId>', methods=['GET'])
+def get_rdvs_by_police(policeId):
+    rdvs = Rdv.query.filter_by(policeId=policeId).all()
+    return jsonify([rdv.to_dict() for rdv in rdvs])

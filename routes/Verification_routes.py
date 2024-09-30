@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from Email_send import send_reset_email
+from models import Declaration
 from models.Utilisateur import Utilisateur
 from flask_login import current_user, login_required
 from app import db
@@ -39,3 +40,21 @@ def reset_password(token):
     user.motDePasse = data['motDePasse']
     db.session.commit()
     return jsonify({"message": "Mot de passe mis à jour avec succès"})
+
+
+
+@verification_bp.route('/verifier_declaration', methods=['POST'])
+def verifier_declaration():
+    data = request.json
+    num_plaque = data.get('numPlaque')
+    num_chassis = data.get('numChassis')
+
+    # Recherchez dans la base de données
+    declaration = Declaration.query.filter_by(numPlaque=num_plaque, numChassis=num_chassis).first()
+
+    if declaration:
+        return jsonify({'found': True}), 200
+    else:
+        return jsonify({'found': False}), 200
+
+
