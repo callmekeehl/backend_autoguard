@@ -130,3 +130,17 @@ def get_rdvs_by_user(utilisateurId):
 def get_rdvs_by_police(policeId):
     rdvs = Rdv.query.filter_by(policeId=policeId).all()
     return jsonify([rdv.to_dict() for rdv in rdvs])
+
+@rdv_bp.route('/rdvs/<int:id>', methods=['GET'])
+def get_rdv(id):
+    rdv = Rdv.query.get_or_404(id)
+    utilisateur = Utilisateur.query.get(rdv.utilisateurId)
+    police = Police.query.get(rdv.policeId)
+
+    return jsonify({
+        'id': rdv.id,
+        'date': rdv.date,
+        'motif': rdv.motif,
+        'utilisateur': utilisateur.to_dict(),
+        'police': police.to_dict()
+    })

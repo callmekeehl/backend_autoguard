@@ -11,6 +11,8 @@ from routes.Rdv_routes import rdv_bp
 from routes.Auth_routes import auth_bp
 from routes.Verification_routes import verification_bp
 from routes.MotifRdv_routes import motif_bp
+from routes.Dashboard_routes import dashboard_bp
+from routes.Vehicule_retrouve_routes import vehicule_retrouve_bp
 
 
 # Création d'un blueprint principal pour l'application
@@ -29,3 +31,7 @@ def register_blueprints(app):
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(verification_bp, url_prefix='/api')
     app.register_blueprint(motif_bp, url_prefix='/api')
+    app.register_blueprint(dashboard_bp, url_prefix='/api')
+    app.register_blueprint(vehicule_retrouve_bp, url_prefix='/api')
+
+

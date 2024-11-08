@@ -58,6 +58,17 @@ def login():
                     "adresseDepartement" : user.adresseDepartement,
                     "policeId": user.policeId
                 }
+            elif user.type == 'admin':
+                user_data = {
+                    "utilisateurId": user.utilisateurId,
+                    "type": user.type,
+                    "nom": user.nom,
+                    "prenom": user.prenom,
+                    "email": user.email,
+                    "adresse": user.adresse,
+                    "telephone": user.telephone,
+                    "adminId": user.adminId
+                }
             else:  # Utilisateur normal
                 user_data = {
                     "utilisateurId": user.utilisateurId,
