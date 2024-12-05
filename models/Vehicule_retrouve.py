@@ -14,6 +14,7 @@ class VehiculeRetrouve(db.Model):
     lieu_lat = db.Column(db.String(100), nullable=False)
     marque = db.Column(db.String(100), nullable=False)
     modele = db.Column(db.String(100), nullable=False)
+    quartier = db.Column(db.String(100), nullable=False)
     date_heure = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def to_dict(self):
@@ -25,6 +26,7 @@ class VehiculeRetrouve(db.Model):
             "num_plaque": self.num_plaque,
             "lieu_long": self.lieu_long,
             "lieu_lat": self.lieu_lat,
+            "quartier": self.quartier,
             "marque": self.marque,
             "modele": self.modele,
             "date_heure": self.date_heure,
