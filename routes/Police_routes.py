@@ -35,6 +35,13 @@ def create_police():
             adresseDepartement=data['adresseDepartement']
         )
         new_police.motDePasse = data['motDePasse']
+
+         # Enregistrer le token FCM si fourni
+        fcm_token = data.get('fcm_token')
+        if fcm_token:
+            new_police.fcm_token = fcm_token
+
+
         db.session.add(new_police)
         db.session.commit()  # Commit ici pour persister les changements
         
@@ -96,3 +103,15 @@ def handle_police(id):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+
+@police_bp.route('/polices/<int:id>/token', methods=['POST'])
+def store_fcm_token(id):
+    police = Police.query.get_or_404(id)
+    fcm_token = request.json.get('fcm_token')
+    
+    if fcm_token:
+        police.fcm_token = fcm_token
+        db.session.commit()
+        return jsonify({"message": "Token FCM enregistré avec succès"}), 200
+    else:
+        return jsonify({"error": "Token FCM manquant"}), 400

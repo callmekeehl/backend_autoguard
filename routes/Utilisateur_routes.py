@@ -22,6 +22,13 @@ def handle_utilisateurs():
             telephone=data['telephone']
         )
         new_user.motDePasse = data['motDePasse']
+
+         # Enregistrer le token FCM si fourni
+        fcm_token = data.get('fcm_token')
+        if fcm_token:
+            new_user.fcm_token = fcm_token
+
+
         db.session.add(new_user)
         db.session.commit()
 
@@ -72,3 +79,15 @@ def get_utilisateur(id):
         'prenom': utilisateur.prenom,
         'utilisateurId': utilisateur.utilisateurId
     })
+
+@utilisateur_bp.route('/utilisateurs/<int:id>/token', methods=['POST'])
+def store_fcm_token(id):
+    utilisateur = Utilisateur.query.get_or_404(id)
+    fcm_token = request.json.get('fcm_token')
+    
+    if fcm_token:
+        utilisateur.fcm_token = fcm_token
+        db.session.commit()
+        return jsonify({"message": "Token FCM enregistré avec succès"}), 200
+    else:
+        return jsonify({"error": "Token FCM manquant"}), 400

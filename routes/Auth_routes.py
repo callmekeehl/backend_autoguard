@@ -12,6 +12,8 @@ def login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('motDePasse')
+    fcm_token = data.get('fcm_token')  # Token FCM envoyé par le client
+
 
     user = Utilisateur.query.filter_by(email=email).first()
 
@@ -22,6 +24,14 @@ def login():
 
             login_user(user)
             print("User logged in")
+
+            if fcm_token:
+                user.fcm_token = fcm_token
+                try:
+                    user.save()  # Sauvegarde en base de données
+                    print("FCM Token mis à jour")
+                except SQLAlchemyError as e:
+                    print(f"Erreur lors de la mise à jour du FCM Token: {e}")
 
             # Générer un token JWT
             token = jwt.encode({

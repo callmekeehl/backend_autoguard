@@ -6,3 +6,4 @@ from .Police import Police
 from .Garage import Garage
 from .Rdv import Rdv
 from .Vehicule_retrouve import VehiculeRetrouve
+from .FcmToken import FcmToken

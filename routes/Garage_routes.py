@@ -38,6 +38,12 @@ def create_garage():
             adresseGarage=data['adresseGarage']
         )
         new_garage.motDePasse = data['motDePasse']
+
+         # Enregistrer le token FCM si fourni
+        fcm_token = data.get('fcm_token')
+        if fcm_token:
+            new_garage.fcm_token = fcm_token
+        
         db.session.add(new_garage)
         db.session.commit()
 

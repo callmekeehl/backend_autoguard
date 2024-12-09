@@ -20,6 +20,8 @@ class Utilisateur(db.Model):
     telephone = db.Column(db.String(15), nullable=False)
     motDePasse_hash = db.Column(db.String(200), nullable=False)
     type = db.Column(db.String(50), default='utilisateur')
+    fcm_token = db.Column(db.String(255), nullable=True)
+
 
 
     @property
@@ -41,7 +43,8 @@ class Utilisateur(db.Model):
             "email": self.email,
             "adresse": self.adresse,
             "telephone": self.telephone,
-            "type": self.type
+            "type": self.type,
+            "fcm_token": self.fcm_token
         }
     
 
