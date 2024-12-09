@@ -50,6 +50,7 @@ def handle_declarations():
         db.session.add(new_declaration)
         db.session.commit()
         return jsonify({"message": "Déclaration créée"}), 201
+        
 
     if request.method == 'GET':
         declarations = Declaration.query.all()

@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from app import db
 from models.MotifRdv import MotifRdv
 from models.Vehicule_retrouve import VehiculeRetrouve
+from models.Declaration import Declaration
 from flask_login import login_required, current_user
 from datetime import datetime
 
@@ -21,6 +22,13 @@ def enregistrer_vehicule():
 
         if utilisateur_id is None:
             return jsonify({"error": "Utilisateur ID est manquant dans motifData"}), 400
+        
+        # Vérifier si un véhicule avec le même numéro de plaque existe déjà dans la table Declaration
+        num_plaque = data['numPlaque']
+        declaration_existante = Declaration.query.filter_by(numPlaque=num_plaque).first()
+        
+        if declaration_existante:
+            return jsonify({"error": "Véhicule avec la même immatriculation existe déjà"}), 400
         
 
         vehicule = VehiculeRetrouve(

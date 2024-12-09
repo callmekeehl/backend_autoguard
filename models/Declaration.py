@@ -12,7 +12,7 @@ class Declaration(db.Model):
     lieuLat = db.Column(db.String(100), nullable=False)
     photoCarteGrise = db.Column(db.String(100), nullable=True)
     numChassis = db.Column(db.String(100), nullable=False)
-    numPlaque = db.Column(db.String(100), nullable=False)
+    numPlaque = db.Column(db.String(100), nullable=False, unique=True)
     marque = db.Column(db.String(100), nullable=False)
     modele = db.Column(db.String(100), nullable=False)
     dateHeure = db.Column(db.DateTime, nullable=False)
