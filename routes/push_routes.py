@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 import requests
-from models import OneSignalPlayerId
+#from models import OneSignalPlayerId
 from app import db
 
 push_bp = Blueprint('push_bp', __name__)
