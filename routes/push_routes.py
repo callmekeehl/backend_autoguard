@@ -1,44 +1,51 @@
 from flask import Blueprint, request, jsonify
 import requests
-#from models import OneSignalPlayerId
+from models import FcmToken
 from app import db
 
 push_bp = Blueprint('push_bp', __name__)
 
-ONESIGNAL_API_KEY = "YOUR_ONESIGNAL_API_KEY"
-ONESIGNAL_APP_ID = "6465087a-45b0-495c-b697-5fd3e057a45b"
+FCM_SERVER_KEY = "YOUR_FCM_SERVER_KEY"
 
 @push_bp.route('/sendNotification', methods=['POST'])
 def envoyer_notification_push():
     """
-    Endpoint pour envoyer une notification push via OneSignal.
+    Endpoint pour envoyer une notification push via FCM à un utilisateur simple.
     """
     try:
         data = request.get_json()
-        player_id = data.get('playerId')  # Player ID du destinataire
-        titre = data.get('title')
-        message = data.get('message')
+        utilisateur_id = data.get('utilisateurId')  # ID de l'utilisateur destinataire
+        titre = data.get('title')  # Titre de la notification
+        message = data.get('message')  # Message de la notification
 
-        if not player_id or not titre or not message:
+        if not utilisateur_id or not titre or not message:
             return jsonify({"success": False, "error": "Champs manquants."}), 400
 
-        # Préparer la requête pour OneSignal
+        # Récupérer le token FCM de l'utilisateur
+        token = FcmToken.query.filter_by(utilisateur_id=utilisateur_id).first()
+
+        if not token:
+            return jsonify({"success": False, "error": "Token FCM non trouvé pour cet utilisateur."}), 404
+
+        # Créer le message de notification
         notification_data = {
-            "app_id": ONESIGNAL_APP_ID,
-            "include_player_ids": [player_id],
-            "headings": {"en": titre},
-            "contents": {"en": message},
+            "notification": {
+                "title": titre,
+                "body": message
+            },
+            "to": token.fcm_token  # Token FCM de l'utilisateur cible
         }
 
-        # Envoyer la requête POST à OneSignal
+        # Envoi de la notification via FCM
         headers = {
-            "Content-Type": "application/json; charset=utf-8",
-            "Authorization": f"Basic {ONESIGNAL_API_KEY}",
+            "Content-Type": "application/json",
+            "Authorization": f"key={FCM_SERVER_KEY}"
         }
+
         response = requests.post(
-            "https://onesignal.com/api/v1/notifications",
+            "https://fcm.googleapis.com/fcm/send",
             headers=headers,
-            json=notification_data,
+            json=notification_data
         )
 
         if response.status_code == 200:
@@ -50,50 +57,33 @@ def envoyer_notification_push():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@push_bp.route('/api/enregistrer_player_id', methods=['POST'])
-def enregistrer_player_id():
+@push_bp.route('/enregistrer_token_fcm', methods=['POST'])
+def enregistrer_token_fcm():
     """
-    Endpoint pour enregistrer ou mettre à jour un Player ID OneSignal pour un utilisateur.
+    Endpoint pour enregistrer ou mettre à jour un token FCM pour un utilisateur.
     """
     data = request.json
 
     utilisateur_id = data.get('utilisateurId')
-    player_id = data.get('playerId')
+    fcm_token = data.get('fcmToken')
 
-    if not utilisateur_id or not player_id:
-        return jsonify({"error": "Données manquantes : utilisateurId et playerId sont requis."}), 400
+    if not utilisateur_id or not fcm_token:
+        return jsonify({"error": "Données manquantes : utilisateurId et fcmToken sont requis."}), 400
 
     try:
-        # Vérifier si un Player ID existe déjà pour cet utilisateur
-        player_id_existant = OneSignalPlayerId.query.filter_by(utilisateur_id=utilisateur_id).first()
+        # Vérifier si un token FCM existe déjà pour cet utilisateur
+        token_existant = FcmToken.query.filter_by(utilisateur_id=utilisateur_id).first()
 
-        if player_id_existant:
-            player_id_existant.player_id = player_id  # Met à jour le Player ID existant
+        if token_existant:
+            token_existant.fcm_token = fcm_token  # Met à jour le token existant
         else:
-            # Ajouter un nouveau Player ID
-            nouveau_player_id = OneSignalPlayerId(utilisateur_id=utilisateur_id, player_id=player_id)
-            db.session.add(nouveau_player_id)
+            # Ajouter un nouveau token
+            nouveau_token = FcmToken(utilisateur_id=utilisateur_id, fcm_token=fcm_token)
+            db.session.add(nouveau_token)
 
         db.session.commit()
-        return jsonify({"message": "Player ID enregistré ou mis à jour avec succès."}), 201
+        return jsonify({"message": "Token FCM enregistré ou mis à jour avec succès."}), 201
 
     except Exception as e:
         db.session.rollback()  # Annuler les modifications en cas d'erreur
-        return jsonify({"error": f"Erreur interne du serveur : {str(e)}"}), 500
-
-
-@push_bp.route('/api/getPlayerId/<int:utilisateur_id>', methods=['GET'])
-def obtenir_player_id(utilisateur_id):
-    """
-    Endpoint pour récupérer le Player ID d'un utilisateur spécifique.
-    """
-    try:
-        player_id = OneSignalPlayerId.query.filter_by(utilisateur_id=utilisateur_id).first()
-
-        if player_id:
-            return jsonify({"playerId": player_id.player_id}), 200
-        else:
-            return jsonify({"error": "Aucun Player ID trouvé pour cet utilisateur."}), 404
-
-    except Exception as e:
         return jsonify({"error": f"Erreur interne du serveur : {str(e)}"}), 500

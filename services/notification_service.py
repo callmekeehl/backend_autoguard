@@ -2,7 +2,7 @@ from firebase_admin import messaging, credentials, initialize_app
 import json
 
 # Initialiser Firebase Admin SDK avec la clé JSON
-cred = credentials.Certificate("config/serviceAccountKey.json")  # Remplacez par le chemin de votre clé JSON
+cred = credentials.Certificate("config/serviceAccountKey.json")  # Remplace par le chemin de la clé JSON
 initialize_app(cred)
 
 def envoyer_notification_push(utilisateur_token, titre, message):
