@@ -14,6 +14,12 @@ utilisateur_bp = Blueprint('utilisateur_bp', __name__)
 def handle_utilisateurs():
     if request.method == 'POST':
         data = request.get_json()
+
+        # Vérifie si l'email existe déjà
+        if Utilisateur.query.filter_by(email=data['email']).first():
+            return jsonify({"error": "Un utilisateur avec cet email existe déjà."}), 400
+        
+        
         new_user = Utilisateur(
             nom=data['nom'],
             prenom=data['prenom'],
